@@ -117,7 +117,7 @@
         box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
       }
 
-      .card img {
+      .card img, .card video {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -213,7 +213,6 @@
       .play-btn:hover { transform: scale(1.08); box-shadow: 0 6px 24px var(--accent-glow); }
       .play-btn:active { transform: scale(0.96); }
 
-      /* Donate nudge */
       .nudge {
         width: 100%;
         max-width: 860px;
@@ -228,12 +227,7 @@
         box-shadow: 0 4px 24px rgba(0,0,0,0.15);
       }
 
-      .nudge-text {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 0;
-      }
+      .nudge-text { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
       .nudge-emoji {
         font-size: 28px;
@@ -243,23 +237,14 @@
 
       @keyframes wiggle {
         0%, 100% { transform: rotate(0deg); }
-        20% { transform: rotate(-12deg); }
-        40% { transform: rotate(12deg); }
-        60% { transform: rotate(-6deg); }
-        80% { transform: rotate(6deg); }
+        20%  { transform: rotate(-12deg); }
+        40%  { transform: rotate(12deg); }
+        60%  { transform: rotate(-6deg); }
+        80%  { transform: rotate(6deg); }
       }
 
-      .nudge-copy p:first-child {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text);
-      }
-
-      .nudge-copy p:last-child {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 2px;
-      }
+      .nudge-copy p:first-child { font-size: 14px; font-weight: 500; color: var(--text); }
+      .nudge-copy p:last-child  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
       .nudge-kofi {
         display: flex;
@@ -281,12 +266,7 @@
         transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
       }
 
-      .nudge-kofi:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px var(--kofi-glow);
-        filter: brightness(1.08);
-      }
-
+      .nudge-kofi:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px var(--kofi-glow); filter: brightness(1.08); }
       .nudge-kofi:active { transform: scale(0.97); }
 
       @media (max-width: 560px) {
@@ -297,10 +277,7 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-          transition-duration: 0.01ms !important;
-          animation-duration: 0.01ms !important;
-        }
+        *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
       }
     </style>
   </head>
@@ -327,10 +304,10 @@
       <main>
         <div class="cards">
           <div class="card">
-            <img src="https://media1.tenor.com/m/0Q5IZ6e9pC8AAAAd/cat-cute-cat.gif" alt="A cute cat dancing" width="440" height="440" loading="lazy" />
+            <video id="vid1" src="Cat 1.mp4" loop muted playsinline preload="auto"></video>
           </div>
           <div class="card">
-            <img src="https://i.pinimg.com/originals/23/51/bc/2351bc65b2b5d75cef146b7edddf805b.gif" alt="Another dancing cat" width="440" height="440" loading="lazy" />
+            <video id="vid2" src="Cat 2.mp4" loop muted playsinline preload="auto"></video>
           </div>
         </div>
       </main>
@@ -342,8 +319,7 @@
           </svg>
         </button>
         <div class="track-info">
-          <div class="track-name">Ice Cream.wav</div>
-          <div class="track-sub">Looping · Local file</div>
+          <div class="track-name">Play Song</div>
         </div>
         <div class="progress-wrap">
           <div class="progress-bar" role="progressbar" aria-label="Playback progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" onclick="seek(event)">
@@ -375,13 +351,18 @@
     </div>
 
     <script>
-      const audio = document.getElementById('audio');
-      const playIcon = document.getElementById('play-icon');
-      const progressFill = document.getElementById('progressFill');
-      const progressBar = document.querySelector('.progress-bar');
-      const currentTimeEl = document.getElementById('currentTime');
-      const durationEl = document.getElementById('duration');
-      const playBtn = document.getElementById('playBtn');
+      const audio         = document.getElementById('audio');
+      const playIcon       = document.getElementById('play-icon');
+      const progressFill   = document.getElementById('progressFill');
+      const progressBar    = document.querySelector('.progress-bar');
+      const currentTimeEl  = document.getElementById('currentTime');
+      const durationEl     = document.getElementById('duration');
+      const playBtn        = document.getElementById('playBtn');
+      const videos         = [document.getElementById('vid1'), document.getElementById('vid2')];
+
+      function setVideos(playing) {
+        videos.forEach(v => playing ? v.play() : v.pause());
+      }
 
       function fmt(s) {
         if (!isFinite(s)) return '—';
@@ -392,10 +373,12 @@
       function toggleMusic() {
         if (audio.paused) {
           audio.play();
+          setVideos(true);
           playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
           playBtn.setAttribute('aria-label', 'Pause');
         } else {
           audio.pause();
+          setVideos(false);
           playIcon.innerHTML = '<polygon points="5,3 19,12 5,21"/>';
           playBtn.setAttribute('aria-label', 'Play');
         }
@@ -415,7 +398,7 @@
       });
 
       function seek(e) {
-        const bar = e.currentTarget;
+        const bar   = e.currentTarget;
         const ratio = e.offsetX / bar.offsetWidth;
         if (audio.duration) audio.currentTime = ratio * audio.duration;
       }
@@ -424,7 +407,7 @@
       function toggleTheme() {
         theme = theme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', theme);
-        const btn = document.getElementById('themeBtn');
+        const btn  = document.getElementById('themeBtn');
         const icon = document.getElementById('theme-icon');
         if (theme === 'light') {
           btn.setAttribute('aria-label', 'Switch to dark mode');
